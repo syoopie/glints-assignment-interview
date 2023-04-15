@@ -29,3 +29,46 @@ app.get("/restaurants/open/:datetime", async (req, res) => {
     res.sendStatus(500);
   }
 });
+
+// List top y restaurants that have more or less than x number of dishes within a price range, ranked alphabetically.
+app.get("/restaurants/top", async (req, res) => {
+  const { lessThan, moreThan, priceFrom, priceTo, sortBy } = req.query;
+  try {
+    const { rows } = await pool.query(`
+      SELECT restaurants.*, COUNT(dishes.*) AS dish_count
+      FROM restaurants
+      JOIN dishes ON restaurants.id = dishes.restaurant_id
+      WHERE price BETWEEN ${priceFrom} AND ${priceTo}
+      GROUP BY restaurants.id
+      HAVING COUNT(dishes.*) ${lessThan ? "<" : ">"} ${
+      lessThan || moreThan || 0
+    }
+      ORDER BY ${sortBy || "restaurant_name"}
+    `);
+    res.send(rows);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
+
+// Search for restaurants or dishes by name, ranked by relevance to search term
+app.get("/search/:term", async (req, res) => {
+  const term = req.params.term;
+  try {
+    const { rows } = await pool.query(`
+      SELECT restaurants.*, ts_rank_cd(to_tsvector('english', restaurant_name), plainto_tsquery('english', '${term}')) AS restaurant_rank,
+        dishes.*, ts_rank_cd(to_tsvector('english', dish_name), plainto_tsquery('english', '${term}')) AS dish_rank
+      FROM restaurants
+      JOIN dishes ON restaurants.id = dishes.restaurant_id
+      WHERE to_tsvector('english', restaurant_name) @@ plainto_tsquery('english', '${term}')
+        OR to_tsvector('english', dish_name) @@ plainto_tsquery('english', '${term}')
+      ORDER BY GREATEST(ts_rank_cd(to_tsvector('english', restaurant_name), plainto_tsquery('english', '${term}')),
+        ts_rank_cd(to_tsvector('english', dish_name), plainto_tsquery('english', '${term}'))) DESC
+    `);
+    res.send(rows);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
