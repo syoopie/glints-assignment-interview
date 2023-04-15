@@ -14,6 +14,8 @@
 
     `CREATE DATABASE food_delivery`
 
+    SCHEMA:
+
     ```SQL
 
     CREATE TABLE restaurants (
