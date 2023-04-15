@@ -110,4 +110,7 @@ dist
 package-lock.json
 
 # Build
-build/
+build
+
+# Local Data
+data
