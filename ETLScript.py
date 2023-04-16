@@ -6,8 +6,8 @@ import psycopg2
 conn = psycopg2.connect(
     host="localhost",
     database="food_delivery",
-    user="sunyupei",
-    password="password"
+    user="YOUR_USERNAME",
+    password="YOUR_PASSWORD"
 )
 cur = conn.cursor()
 
@@ -55,10 +55,10 @@ def parse_hours(hours_str: str):
 
 
 # Load data from JSON files
-with open('restaurant_with_menu.json') as f:
+with open('data/restaurant_with_menu.json') as f:
     restaurants = json.load(f)
 
-with open('users_with_purchase_history.json') as f:
+with open('data/users_with_purchase_history.json') as f:
     users = json.load(f)
 
 # Insert data into PostgreSQL

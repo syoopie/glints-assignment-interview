@@ -1,4 +1,4 @@
-# Overall Work Tracker
+# Setup Guide
 
 ## 1. Loading data
 
@@ -60,4 +60,19 @@
 
     `python ETLScript.py`
 
+    Remember to replace the user and password fields in the script with your own username and password
+
 All data should now be loaded into the database.
+
+## 2. Starting the database
+
+1. Install dependencies
+
+    Run this command in the root directory to install all necessary dependencies.
+
+    `npm install`
+
+2. Start the server
+
+    Use this command to run the script that compiles the Typescript code and starts the server
+    `npm start`
